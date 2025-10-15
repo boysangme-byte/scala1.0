@@ -65,8 +65,9 @@ h1{font-size:clamp(34px,6vw,68px)} h2{font-size:clamp(26px,4.8vw,48px)}
 #liquid canvas{position:absolute;inset:0}
 
 /* Door split */
-#door .left,#door .right{position:absolute;top:0;bottom:0;width:50%;background:#120c07}
-#door .left{left:0;transform-origin:left}#door .right{right:0;transform-origin:right}
+#door .left,#door .right{position:absolute;top:0;bottom:0;width:50%;background:#120c07;z-index:2}
+#door .left{left:0;transform-origin:left}
+#door .right{right:0;transform-origin:right}
 
 /* Timeline */
 .timeline{position:absolute;left:50%;transform:translateX(-50%);bottom:12vh;display:flex;gap:min(9vw,120px);flex-wrap:wrap}
@@ -143,10 +144,11 @@ footer{min-height:60vh;display:grid;place-items:center}
 
   <div class="light"></div><div class="swipe"></div>
 
-<div class="content" style="z-index:4; transform: translateY(8vh);">
-  <h1>오늘의 의식이 시작됩니다</h1>
-  <p class="lead">허브 · 유리 · 빛. 조용히 집중되는 한 순간.</p>
-</div>
+  <!-- ↓ 텍스트 더 낮춤 -->
+  <div class="content" style="z-index:4; transform: translateY(12vh);">
+    <h1>오늘의 의식이 시작됩니다</h1>
+    <p class="lead">허브 · 유리 · 빛. 조용히 집중되는 한 순간.</p>
+  </div>
 </section>
 
 <!-- ===== 2) Herbarium — 4.png ===== -->
@@ -295,12 +297,35 @@ function lazyLoadImages(){
       entries.forEach(entry=>{
         if(entry.isIntersecting){
           const el=entry.target; io.unobserve(el);
-          resolvePath(el.dataset.file,(src)=>{ el.src=src||el.dataset.file; el.removeAttribute('data-file'); if(--left===0) res(); });
+          resolvePath(el.dataset.file,(src)=>{
+            el.src=src||el.dataset.file;
+            el.removeAttribute('data-file');
+            /* 로딩/매핑 콘솔 로깅 */
+            if(!src){ console.warn('[image] fallback used for', el); }
+            if(--left===0) res();
+          });
+          el.addEventListener('error',()=>console.error('[image] failed to load:', el.src));
         }
       });
     },{rootMargin:"200px 0px"});
     imgs.forEach(el=>{ el.setAttribute('loading','lazy'); io.observe(el); });
   });
+}
+
+/* ---------- 매핑 검증(2~18.png 존재 확인: 콘솔) ---------- */
+function verifyImageMapping(){
+  const expected = Array.from({length:17},(_,i)=>`${i+2}.png`); // 2..18
+  const loaded = [...document.querySelectorAll('section img.bg')].map(i=>i.currentSrc || i.src);
+  const results = expected.map(name=>{
+    const ok = loaded.some(src=>src && src.endsWith(name));
+    return {name, ok};
+  });
+  const missing = results.filter(r=>!r.ok);
+  if(missing.length){
+    console.warn('[mapping] Missing images:', missing.map(m=>m.name));
+  }else{
+    console.log('[mapping] All expected images (2.png ~ 18.png) mapped OK.');
+  }
 }
 
 /* ---------- 초기화 ---------- */
@@ -322,11 +347,11 @@ function init(){
     if(bg) gsap.fromTo(bg,{scale:1.02},{scale:1.06,scrollTrigger:{trigger:sec,start:"top top",end:"bottom top",scrub:true}});
   });
 
-  /* HERO: Video + Overlays 크로스페이드 (비디오 → 2.png → 3.png) */
+  /* HERO: Video → 2.png → 3.png 크로스페이드 */
   const heroTl = gsap.timeline({scrollTrigger:{trigger:'#hero',start:'top top',end:'+=90%',scrub:true}});
   heroTl.to('#hero video.bg',{opacity:1,scale:1,ease:'none'},0)
         .to('#hero .img-b',{opacity:1,scale:1,ease:'none'},0.2)
-        .to('#hero .img-c',{opacity:1,ease:'none'},0.55);
+        .to('#hero .img-c',{opacity:1,ease:'none'},0.55});
 
   /* Herbarium 돋보기: 터치에서는 자동 센터 고정 */
   const loupe=document.querySelector('#herb .loupe');
@@ -345,9 +370,16 @@ function init(){
     });
   }
 
-  /* Door split (더 자연스럽게) */
-  gsap.to('#door .left',{scaleX:0,ease:'expo.out',scrollTrigger:{trigger:'#door',start:'top 60%',end:'bottom top',scrub:true}});
-  gsap.to('#door .right',{scaleX:0,ease:'expo.out',scrollTrigger:{trigger:'#door',start:'top 60%',end:'bottom top',scrub:true}});
+  /* Door split — 보이는 타이밍/가시성 개선 */
+  gsap.set(['#door .left','#door .right'], {scaleX:1}); // 시작 상태 확실히 닫힘
+  gsap.to('#door .left',{
+    scaleX:0, ease:'power4.out',
+    scrollTrigger:{trigger:'#door',start:'top 75%',end:'bottom 20%',scrub:true}
+  });
+  gsap.to('#door .right',{
+    scaleX:0, ease:'power4.out',
+    scrollTrigger:{trigger:'#door',start:'top 75%',end:'bottom 20%',scrub:true}
+  });
 
   /* Timeline dots: translateY 포함 */
   gsap.to('#tiles .tp',{opacity:1,y:0,stagger:.12,duration:.8,ease:'power2.out',scrollTrigger:{trigger:'#tiles',start:'top 65%',once:true}});
@@ -442,6 +474,9 @@ function init(){
   });
   // 5초 후 1회 노출 (이미 본 사용자는 스킵)
   setTimeout(openPopup,5000);
+
+  /* 이미지 매핑 검증 로그 */
+  verifyImageMapping();
 }
 
 /* 시작: Lazy 이미지 로딩 후 초기화 */
@@ -450,8 +485,7 @@ lazyLoadImages().then(init);
 /* HERO 비디오 폴백 처리 (소스 실패 시 포스터만 노출) */
 (function ensureHeroVideo(){
   const v=document.getElementById('heroVideo'); if(!v) return;
-  let failed=false;
-  v.addEventListener('error',()=>{failed=true; v.parentElement.removeChild(v);});
+  v.addEventListener('error',()=>{ console.error('[video] failed to load hero video'); v.parentElement.removeChild(v); });
   // 모바일 자동재생 보조
   const tryPlay=()=>{ v.play().catch(()=>{}); };
   document.addEventListener('touchstart',tryPlay,{once:true,passive:true});
@@ -459,5 +493,3 @@ lazyLoadImages().then(init);
 </script>
 </body>
 </html>
-
-
