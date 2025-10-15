@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Apoteca Scala — Final</title>
+<meta name="description" content="허브 · 유리 · 빛. Apoteca Scala가 제안하는 오늘의 의식. 라벤더, 세이지, 로즈마리로 완성되는 고요한 순간을 경험하세요." />
 
 <!-- GSAP -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -47,12 +48,13 @@ h1{font-size:clamp(34px,6vw,68px)} h2{font-size:clamp(26px,4.8vw,48px)}
   transform:skewX(-25deg);animation:lightMove 6s infinite;z-index:2}
 @keyframes lightMove{0%{left:-75%}50%{left:125%}100%{left:125%}}
 
+/* HERO video */
+#hero .stage{position:sticky;top:0;height:100vh}
+#hero video.bg{opacity:1}
+#hero .img-b,#hero .img-c{position:absolute;inset:0;opacity:0;transform:scale(1.04)}
+
 /* Special elements */
 #particles{position:fixed;inset:0;pointer-events:none;z-index:0}
-
-/* Hero */
-#hero .stage{position:sticky;top:0;height:100vh}
-#hero .img{position:absolute;inset:0;opacity:0;transform:scale(1.04)}
 
 /* Herbarium loupe */
 #herb .loupe{position:absolute;width:min(28vw,340px);height:min(28vw,340px);right:12vw;bottom:18vh;border-radius:50%;
@@ -67,8 +69,9 @@ h1{font-size:clamp(34px,6vw,68px)} h2{font-size:clamp(26px,4.8vw,48px)}
 #door .left{left:0;transform-origin:left}#door .right{right:0;transform-origin:right}
 
 /* Timeline */
-.timeline{position:absolute;left:50%;transform:translateX(-50%);bottom:12vh;display:flex;gap:min(9vw,120px)}
-.tp{color:#cbb;opacity:0;text-align:center}.dot{width:14px;height:14px;background:linear-gradient(180deg,#ead8a5,#c8a25a);border:1px solid rgba(0,0,0,.25);margin:0 auto 8px}
+.timeline{position:absolute;left:50%;transform:translateX(-50%);bottom:12vh;display:flex;gap:min(9vw,120px);flex-wrap:wrap}
+.tp{color:#cbb;opacity:0;text-align:center;transform:translateY(16px)}
+.dot{width:14px;height:14px;background:linear-gradient(180deg,#ead8a5,#c8a25a);border:1px solid rgba(0,0,0,.25);margin:0 auto 8px;border-radius:50%}
 
 /* Products magnets */
 .mag-row{position:absolute;left:50%;transform:translateX(-50%);bottom:8vh;display:flex;gap:min(5vw,40px);align-items:end}
@@ -97,13 +100,20 @@ footer{min-height:60vh;display:grid;place-items:center}
 @keyframes up{to{transform:none;opacity:1}}
 .pop h3{font:600 22px/1.3 "EB Garamond",serif;margin:0 0 12px}.pop p{color:#534a3f}
 .pop input{width:100%;padding:12px;border:1px solid rgba(0,0,0,.25);margin:14px 0}
-.pop .cta{background:linear-gradient(90deg,var(--gold),var(--amber));border:none;color:#fff;padding:12px 18px}
+.pop .cta{background:linear-gradient(90deg,var(--gold),var(--amber));border:none;color:#fff;padding:12px 18px;cursor:pointer}
 .pop .x{position:absolute;top:8px;right:12px;border:none;background:none;font-size:24px;color:#5a5146;cursor:pointer}
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important}
   #particles,#herb .loupe,#liquid canvas{display:none}
+}
+
+/* Mobile tweaks */
+@media (max-width:768px){
+  h1{font-size:clamp(28px,8vw,52px)}
+  .lead{font-size:15px}
+  .grid{grid-template-columns:repeat(2,1fr)!important}
 }
 </style>
 </head>
@@ -118,32 +128,41 @@ footer{min-height:60vh;display:grid;place-items:center}
 
 <canvas id="particles" aria-hidden="true"></canvas>
 
-<!-- ===== 1) HERO (1~3 순차 크로스페이드) ===== -->
-<section id="hero" class="section">
-  <img class="bg img img-a" data-file="1.png" alt="">
-  <img class="bg img img-b" data-file="2.png" alt="" style="opacity:0">
-  <img class="bg img img-c" data-file="3.png" alt="" style="opacity:0">
+<!-- ===== 1) HERO: Video + crossfade overlays ===== -->
+<section id="hero" class="section" aria-label="오늘의 의식 히어로">
+  <div class="stage" aria-hidden="true"></div>
+
+  <!-- Background video -->
+  <video class="bg" id="heroVideo" autoplay muted playsinline loop poster="1.png">
+    <source src="1.1.mp4" type="video/mp4">
+  </video>
+
+  <!-- Crossfade overlays to keep original feel -->
+  <img class="bg img-b" data-file="2.png" alt="빛 속 유리와 허브의 질감">
+  <img class="bg img-c" data-file="3.png" alt="의식의 잔향을 암시하는 빛의 흐름">
+
   <div class="light"></div><div class="swipe"></div>
+
   <div class="content" style="z-index:4">
     <h1>오늘의 의식이 시작됩니다</h1>
     <p class="lead">허브 · 유리 · 빛. 조용히 집중되는 한 순간.</p>
   </div>
 </section>
 
-<!-- ===== 2) Herbarium — 2.png (섹션은 2번이지만 배경은 2.png가 히어로에도 쓰이므로 여기서는 4.png부터 시작) ===== -->
-<section id="herb" class="section">
-  <img class="bg" data-file="4.png" alt="">
-  <div class="loupe"></div>
+<!-- ===== 2) Herbarium — 4.png ===== -->
+<section id="herb" class="section" aria-label="허브 도감">
+  <img class="bg" data-file="4.png" alt="라벤더와 세이지가 놓인 고요한 책상">
+  <div class="loupe" aria-hidden="true"></div>
   <div class="content">
     <h2>라벤더의 고요, 세이지의 균형</h2>
     <p class="lead">오래된 도감처럼, 그러나 오늘에 맞게.</p>
   </div>
 </section>
 
-<!-- ===== 3) Corridor / Light weave — 4.png 효과 섹션은 위에서 처리, 다음은 5.png 문 ===== -->
-<section id="door" class="section">
-  <img class="bg" data-file="5.png" alt="">
-  <div class="left"></div><div class="right"></div>
+<!-- ===== 3) Corridor / Door — 5.png ===== -->
+<section id="door" class="section" aria-label="문을 여는 공간">
+  <img class="bg" data-file="5.png" alt="어두운 복도 끝의 문">
+  <div class="left" aria-hidden="true"></div><div class="right" aria-hidden="true"></div>
   <div class="content">
     <h2>문을 여세요</h2>
     <p class="lead">향, 차, 빵 그리고 빛. 오늘의 처방을 고르세요.</p>
@@ -151,8 +170,8 @@ footer{min-height:60vh;display:grid;place-items:center}
 </section>
 
 <!-- ===== 4) Tiles corridor — 6.png ===== -->
-<section id="tiles" class="section">
-  <img class="bg" data-file="6.png" alt="">
+<section id="tiles" class="section" aria-label="시간의 타임라인">
+  <img class="bg" data-file="6.png" alt="타일 복도 위의 빛 흔들림">
   <div class="content">
     <h2>전통과 오늘 사이</h2>
     <p class="lead">방식은 지키고 디테일은 업데이트했습니다.</p>
@@ -165,82 +184,82 @@ footer{min-height:60vh;display:grid;place-items:center}
 </section>
 
 <!-- ===== 5) Products — 7.png ===== -->
-<section id="products" class="section">
-  <img class="bg" data-file="7.png" alt="">
+<section id="products" class="section" aria-label="제품 섹션">
+  <img class="bg" data-file="7.png" alt="앰플, 허브티, 비스코티, 캔들이 놓인 테이블">
   <div class="content"><h2>하루를 만드는 구성</h2><p class="lead">앰플, 허브티, 비스코티, 캔들</p></div>
   <div class="mag-row" aria-hidden="true"><div class="mag" data-mass="1.2"></div><div class="mag" data-mass="1.0"></div><div class="mag" data-mass="1.4"></div><div class="mag" data-mass="1.1"></div></div>
 </section>
 
 <!-- ===== 6) UGC — 8.png ===== -->
-<section id="ugc" class="section">
-  <img class="bg" data-file="8.png" alt="">
+<section id="ugc" class="section" aria-label="일상 속 장면">
+  <img class="bg" data-file="8.png" alt="따뜻한 식탁의 실제 장면">
   <div class="content"><h2>진짜 식탁, 진짜 빛</h2><p class="lead">과장 없는 일상의 장면들.</p></div>
   <div class="grid" aria-hidden="true"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
 </section>
 
 <!-- ===== 7) Membership — 9.png ===== -->
-<section id="member" class="section">
-  <img class="bg" data-file="9.png" alt="">
-  <div class="shine"></div>
+<section id="member" class="section" aria-label="멤버십 소개">
+  <img class="bg" data-file="9.png" alt="따뜻한 조명 속 멤버십 초대">
+  <div class="shine" aria-hidden="true"></div>
   <div class="content"><h2>Scala Ritual Club</h2><p class="lead">초대·샘플·프리뷰. 쓰는 만큼 깊어지는 혜택.</p></div>
 </section>
 
 <!-- ===== 8) Gift — 10.png ===== -->
-<section id="gift" class="section">
-  <img class="bg" data-file="10.png" alt="">
+<section id="gift" class="section" aria-label="선물 포장">
+  <img class="bg" data-file="10.png" alt="카드와 왁스 실링이 장식된 선물 상자">
   <div class="content"><h2>마음이 보이는 포장</h2><p class="lead">카드와 왁스 실링, 연중 가능.</p></div>
 </section>
 
 <!-- ===== 9) Membership BG / Warm — 11.png ===== -->
-<section id="s11" class="section">
-  <img class="bg" data-file="11.png" alt="">
+<section id="s11" class="section" aria-label="아틀리에 배경">
+  <img class="bg" data-file="11.png" alt="따뜻한 톤의 아틀리에 공간">
   <div class="content"><h2>Atelier</h2><p class="lead">조용한 배경, 집중되는 시간.</p></div>
 </section>
 
 <!-- ===== 10) Amber Bottle — 12.png ===== -->
-<section id="s12" class="section">
-  <img class="bg" data-file="12.png" alt="">
+<section id="s12" class="section" aria-label="핸드크래프트 보틀">
+  <img class="bg" data-file="12.png" alt="앰버 보틀의 질감과 라벨">
   <div class="content"><h2>Handcrafted</h2><p class="lead">한 병의 이야기, 한 번의 터치.</p></div>
 </section>
 
 <!-- ===== 11) Ingredients — 13.png ===== -->
-<section id="s13" class="section">
-  <img class="bg" data-file="13.png" alt="">
+<section id="s13" class="section" aria-label="허브 원산">
+  <img class="bg" data-file="13.png" alt="라벤더, 세이지, 로즈마리의 클로즈업">
   <div class="content"><h2>Herbal Origin</h2><p class="lead">라벤더 · 세이지 · 로즈마리.</p></div>
 </section>
 
-<!-- ===== 12) Tea (한 방울의 변화 실제 장면) — 14.png ===== -->
-<section id="liquid" class="section">
-  <img class="bg" data-file="14.png" alt="">
+<!-- ===== 12) Tea — 14.png ===== -->
+<section id="liquid" class="section" aria-label="한 방울의 변화">
+  <img class="bg" data-file="14.png" alt="차 표면의 잔잔한 움직임">
   <canvas id="ripples" aria-hidden="true"></canvas>
   <div class="content"><h2>한 방울의 변화</h2><p class="lead">표면이 잔잔히 흔들리면 마음도 가라앉습니다.</p></div>
 </section>
 
 <!-- ===== 13) Atelier — 15.png ===== -->
-<section id="s15" class="section">
-  <img class="bg" data-file="15.png" alt="">
+<section id="s15" class="section" aria-label="아포테카 내부">
+  <img class="bg" data-file="15.png" alt="빛과 그림자가 교차하는 내부 공간">
   <div class="content"><h2>Apotheca Inside</h2><p class="lead">빛과 그림자가 머무는 공간.</p></div>
 </section>
 
 <!-- ===== 14) Texture — 16.png ===== -->
-<section id="s16" class="section">
-  <img class="bg" data-file="16.png" alt="">
+<section id="s16" class="section" aria-label="향의 구조">
+  <img class="bg" data-file="16.png" alt="탑, 미들, 베이스의 레이어 질감">
   <div class="content"><h2>향의 구조</h2><p class="lead">탑 · 미들 · 베이스.</p></div>
 </section>
 
 <!-- ===== 15) Essentials — 17.png ===== -->
-<section id="s17" class="section">
-  <img class="bg" data-file="17.png" alt="">
+<section id="s17" class="section" aria-label="에센셜">
+  <img class="bg" data-file="17.png" alt="일상을 구성하는 필수 아이템">
   <div class="content"><h2>Essentials</h2><p class="lead">당신의 하루를 구성하는 모든 것.</p></div>
 </section>
 
 <!-- ===== 16) Finale — 18.png ===== -->
-<section id="s18" class="section">
-  <img class="bg" data-file="18.png" alt="">
+<section id="s18" class="section" aria-label="피날레">
+  <img class="bg" data-file="18.png" alt="빛 속에 남는 잔향의 피날레">
   <div class="content"><h2>Light Finale</h2><p class="lead">불빛 속에 머무는 잔향.</p></div>
 </section>
 
-<footer class="section" style="background:#1b130d">
+<footer class="section" style="background:#1b130d" aria-label="푸터">
   <div class="content">
     <h2 style="font-family:'EB Garamond',serif">Apoteca Scala</h2>
     <p class="lead" style="color:#e7dbbf">© 2025 Roma · Santa Maria della Scala</p>
@@ -260,60 +279,81 @@ footer{min-height:60vh;display:grid;place-items:center}
 </div>
 
 <script>
-/* ---------- 경로 자동 감지 (./ 또는 ./images/) ---------- */
+/* ---------- 경로 자동 감지 + Lazy 로딩 ---------- */
 const pathCandidates=["","images/","./images/"];
 function resolvePath(file,done){
-  let i=0; const im=new Image();
+  let i=0; const im=new Image(); im.loading="lazy";
   const next=()=>{ if(i>=pathCandidates.length){done(null);return;}
     const src=pathCandidates[i++]+file; im.onload=()=>done(src); im.onerror=next; im.src=src; };
   next();
 }
-function loadImages(cb){
+function lazyLoadImages(){
   const imgs=[...document.querySelectorAll('img[data-file]')];
-  let left=imgs.length; if(!left){cb();return;}
-  imgs.forEach(el=>resolvePath(el.dataset.file,(src)=>{ el.src=src||el.dataset.file; if(--left===0) cb(); }));
+  if(!imgs.length) return Promise.resolve();
+  return new Promise(res=>{
+    let left=imgs.length; const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          const el=entry.target; io.unobserve(el);
+          resolvePath(el.dataset.file,(src)=>{ el.src=src||el.dataset.file; el.removeAttribute('data-file'); if(--left===0) res(); });
+        }
+      });
+    },{rootMargin:"200px 0px"});
+    imgs.forEach(el=>{ el.setAttribute('loading','lazy'); io.observe(el); });
+  });
 }
 
-/* ---------- 애니메이션 초기화 (이미지 로드 후) ---------- */
+/* ---------- 초기화 ---------- */
 function init(){
   const topbar=document.querySelector('.topbar');
   addEventListener('scroll',()=>{topbar.classList.toggle('scrolled',scrollY>innerHeight*0.7)},{passive:true});
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // 모든 섹션 핀/스크럽 + 배경 살짝 확대
+  /* Pin 조건: 데스크톱에서만 풀 pin (모바일 성능 보호) */
+  const enablePins = window.matchMedia('(min-width: 1025px)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 섹션 공통: 배경 살짝 확대
   gsap.utils.toArray('.section').forEach(sec=>{
-    ScrollTrigger.create({trigger:sec,start:'top top',end:'bottom top',pin:true,scrub:true,anticipatePin:1,pinSpacing:false});
+    if(enablePins){
+      ScrollTrigger.create({trigger:sec,start:'top top',end:'bottom top',pin:true,scrub:true,anticipatePin:1,pinSpacing:false});
+    }
     const bg=sec.querySelector('.bg'); sec.classList.add('visible');
     if(bg) gsap.fromTo(bg,{scale:1.02},{scale:1.06,scrollTrigger:{trigger:sec,start:"top top",end:"bottom top",scrub:true}});
   });
 
-  // HERO 1→2→3 크로스페이드
-  gsap.to('#hero .img-a',{opacity:1,scale:1,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'+=33%',scrub:true}});
-  gsap.to('#hero .img-b',{opacity:1,scale:1,ease:'none',scrollTrigger:{trigger:'#hero',start:'top+=20% top',end:'+=33%',scrub:true}});
-  gsap.to('#hero .img-c',{opacity:1,ease:'none',scrollTrigger:{trigger:'#hero',start:'top+=45% top',end:'+=33%',scrub:true}});
+  /* HERO: Video + Overlays 크로스페이드 (비디오 → 2.png → 3.png) */
+  const heroTl = gsap.timeline({scrollTrigger:{trigger:'#hero',start:'top top',end:'+=90%',scrub:true}});
+  heroTl.to('#hero video.bg',{opacity:1,scale:1,ease:'none'},0)
+        .to('#hero .img-b',{opacity:1,scale:1,ease:'none'},0.2)
+        .to('#hero .img-c',{opacity:1,ease:'none'},0.55);
 
-  // Herbarium 돋보기
+  /* Herbarium 돋보기: 터치에서는 자동 센터 고정 */
   const loupe=document.querySelector('#herb .loupe');
+  const isTouch = matchMedia('(pointer:coarse)').matches;
   ScrollTrigger.create({trigger:'#herb',start:'top center',end:'bottom center',scrub:true,
     onEnter:()=>loupe.style.opacity=.9,onLeave:()=>loupe.style.opacity=0,onEnterBack:()=>loupe.style.opacity=.9,onLeaveBack:()=>loupe.style.opacity=0});
-  ['pointermove','touchmove'].forEach(evt=>{
-    addEventListener(evt,e=>{
-      const rect=document.querySelector('#herb').getBoundingClientRect();
-      const x=(e.touches?e.touches[0].clientX:e.clientX), y=(e.touches?e.touches[0].clientY:e.clientY);
-      if(y>rect.top && y<rect.bottom){ loupe.style.transform=`translate(${x - loupe.offsetWidth/2}px, ${y - loupe.offsetHeight/2}px)`; }
-    },{passive:true});
-  });
+  if(isTouch){
+    loupe.style.transform='translate(calc(50vw - 50%), calc(50vh - 50%))';
+  }else{
+    ['pointermove','touchmove'].forEach(evt=>{
+      addEventListener(evt,e=>{
+        const rect=document.querySelector('#herb').getBoundingClientRect();
+        const x=(e.touches?e.touches[0].clientX:e.clientX), y=(e.touches?e.touches[0].clientY:e.clientY);
+        if(y>rect.top && y<rect.bottom){ loupe.style.transform=`translate(${x - loupe.offsetWidth/2}px, ${y - loupe.offsetHeight/2}px)`; }
+      },{passive:true});
+    });
+  }
 
-  // Door split (5.png)
-  gsap.to('#door .left',{scaleX:0,ease:'power2.out',scrollTrigger:{trigger:'#door',start:'top 60%',end:'bottom top',scrub:true}});
-  gsap.to('#door .right',{scaleX:0,ease:'power2.out',scrollTrigger:{trigger:'#door',start:'top 60%',end:'bottom top',scrub:true}});
+  /* Door split (더 자연스럽게) */
+  gsap.to('#door .left',{scaleX:0,ease:'expo.out',scrollTrigger:{trigger:'#door',start:'top 60%',end:'bottom top',scrub:true}});
+  gsap.to('#door .right',{scaleX:0,ease:'expo.out',scrollTrigger:{trigger:'#door',start:'top 60%',end:'bottom top',scrub:true}});
 
-  // Timeline dots
+  /* Timeline dots: translateY 포함 */
   gsap.to('#tiles .tp',{opacity:1,y:0,stagger:.12,duration:.8,ease:'power2.out',scrollTrigger:{trigger:'#tiles',start:'top 65%',once:true}});
-  ScrollTrigger.create({trigger:'#tiles',start:'top top+=64',end:'+=120%',pin:'.timeline',scrub:true,snap:1/2});
+  ScrollTrigger.create({trigger:'#tiles',start:'top top+=64',end:'+=120%',pin: enablePins ? '.timeline' : false,scrub:true,snap: enablePins ? 1/2 : false});
 
-  // Products magnets
+  /* Products magnets */
   const mags=[...document.querySelectorAll('#products .mag')];
   addEventListener('pointermove',e=>{
     mags.forEach(m=>{
@@ -324,45 +364,98 @@ function init(){
     });
   });
 
-  // UGC 그리드
+  /* UGC 그리드 */
   gsap.to('#ugc .cell',{opacity:1,y:0,stagger:.1,duration:.7,ease:'power2.out',scrollTrigger:{trigger:'#ugc',start:'top 70%',once:true}});
   ScrollTrigger.create({trigger:'#ugc',start:'top top',end:'+=120%',scrub:true,onUpdate:self=>{
     const g=document.querySelector('#ugc .grid'); const p=self.progress; const cols=p<.33?4:(p<.66?3:2); g.style.gridTemplateColumns=`repeat(${cols},1fr)`; }});
 
-  // Membership shine
-  gsap.to('#member .shine',{opacity:1,duration:1.2,ease:'sine.inOut',scrollTrigger:{trigger:'#member',start:'top 70%',once:true}});
-  gsap.to('#member .shine',{backgroundPosition:'150% 50%',repeat:-1,yoyo:true,duration:6,ease:'sine.inOut'});
-
-  // Liquid ripples (14.png)
+  /* Liquid ripples (가시성에 따라 rAF 제어) */
   const cvs=document.getElementById('ripples'), ctx=cvs.getContext('2d');
   function fit(){cvs.width=innerWidth; cvs.height=document.getElementById('liquid').offsetHeight}
   addEventListener('resize',fit,{passive:true}); fit();
-  let waves=[]; (function loop(){ctx.clearRect(0,0,cvs.width,cvs.height); waves=waves.filter(w=>w.a>0.02);
+  let waves=[], running=true;
+  function loop(){
+    if(!running) return;
+    ctx.clearRect(0,0,cvs.width,cvs.height); waves=waves.filter(w=>w.a>0.02);
     for(const w of waves){w.r+=2.2; w.a*=0.985; ctx.beginPath(); ctx.arc(w.x,w.y,w.r,0,Math.PI*2); ctx.strokeStyle=`rgba(255,230,180,${w.a})`; ctx.lineWidth=1.5; ctx.stroke();}
-    requestAnimationFrame(loop);} )();
+    requestAnimationFrame(loop);
+  }
+  running=true; requestAnimationFrame(loop);
   let t; addEventListener('scroll',()=>{clearTimeout(t);t=setTimeout(()=>{const r=document.getElementById('liquid').getBoundingClientRect();
     if(r.top<innerHeight && r.bottom>0){ waves.push({x:cvs.width*.5,y:cvs.height*.65,r:4,a:.9}); }},90)},{passive:true});
 
-  // 입자(상시)
+  /* 입자(상시) — 가시성에 따라 일시정지 */
   const pc=document.getElementById('particles'),px=pc.getContext('2d'); function psize(){pc.width=innerWidth;pc.height=innerHeight}
   addEventListener('resize',psize,{passive:true}); psize();
   const pts=Array.from({length:160},()=>({x:Math.random()*pc.width,y:Math.random()*pc.height,v:.2+Math.random()*.5,r:.6+Math.random()*1.4}));
-  (function pl(){px.clearRect(0,0,pc.width,pc.height); px.fillStyle='rgba(194,165,98,.7)';
+  let particlesRunning=true;
+  function pl(){ if(!particlesRunning) return; px.clearRect(0,0,pc.width,pc.height); px.fillStyle='rgba(194,165,98,.7)';
     pts.forEach(p=>{p.y+=p.v; if(p.y>pc.height){p.y=-10;p.x=Math.random()*pc.width} px.beginPath(); px.arc(p.x,p.y,p.r,0,Math.PI*2); px.fill();});
-    requestAnimationFrame(pl)})();
+    requestAnimationFrame(pl)}
+  particlesRunning=true; requestAnimationFrame(pl);
 
-  // 팝업 (5초 후)
-  const pop=document.getElementById('popup'); const show=()=>{pop.classList.add('active');pop.setAttribute('aria-hidden','false')};
-  setTimeout(show,5000);
-  document.querySelector('#popup .x').addEventListener('click',()=>{pop.classList.remove('active');pop.setAttribute('aria-hidden','true')});
-  document.getElementById('submitEmail').addEventListener('click',()=>{
-    const v=document.getElementById('email').value.trim();
-    if(v){ alert('사전예약 등록 완료: '+v); pop.classList.remove('active'); }
+  document.addEventListener('visibilitychange',()=>{
+    const visible=document.visibilityState==='visible';
+    particlesRunning=visible; running=visible;
+    if(visible){ requestAnimationFrame(pl); requestAnimationFrame(loop); }
   });
+
+  /* Popup: 접근성 + 재노출 방지(localStorage) + ESC + Focus Trap */
+  const pop=document.getElementById('popup');
+  const dialog=pop.querySelector('.pop');
+  const emailInput=document.getElementById('email');
+  const closeBtn=pop.querySelector('.x');
+  const submitBtn=document.getElementById('submitEmail');
+  let lastFocused=null;
+
+  function openPopup(){
+    if(localStorage.getItem('apoteca_popup_seen')==='1') return;
+    lastFocused=document.activeElement;
+    pop.classList.add('active');pop.setAttribute('aria-hidden','false');
+    setTimeout(()=>emailInput.focus(),50);
+    localStorage.setItem('apoteca_popup_seen','1');
+    trapFocus(true);
+  }
+  function closePopup(){
+    pop.classList.remove('active');pop.setAttribute('aria-hidden','true');
+    trapFocus(false);
+    if(lastFocused) lastFocused.focus();
+  }
+  function trapFocus(enable){
+    const focusable=dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if(!enable) { dialog.onkeydown=null; return; }
+    const first=focusable[0], last=focusable[focusable.length-1];
+    dialog.onkeydown=(e)=>{
+      if(e.key==='Tab'){
+        if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+        else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+      }
+      if(e.key==='Escape'){ e.preventDefault(); closePopup(); }
+    };
+  }
+  closeBtn.addEventListener('click',closePopup);
+  pop.querySelector('.pop-ov').addEventListener('click',closePopup);
+  submitBtn.addEventListener('click',()=>{
+    const v=emailInput.value.trim();
+    if(v && emailInput.checkValidity()){ alert('사전예약 등록 완료: '+v); closePopup(); }
+    else{ emailInput.reportValidity(); }
+  });
+  // 5초 후 1회 노출 (이미 본 사용자는 스킵)
+  setTimeout(openPopup,5000);
 }
 
-/* 시작: 이미지 로드 후 초기화 */
-loadImages(init);
+/* 시작: Lazy 이미지 로딩 후 초기화 */
+lazyLoadImages().then(init);
+
+/* HERO 비디오 폴백 처리 (소스 실패 시 포스터만 노출) */
+(function ensureHeroVideo(){
+  const v=document.getElementById('heroVideo'); if(!v) return;
+  let failed=false;
+  v.addEventListener('error',()=>{failed=true; v.parentElement.removeChild(v);});
+  // 모바일 자동재생 보조
+  const tryPlay=()=>{ v.play().catch(()=>{}); };
+  document.addEventListener('touchstart',tryPlay,{once:true,passive:true});
+})();
 </script>
 </body>
 </html>
